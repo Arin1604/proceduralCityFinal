@@ -20,7 +20,7 @@
 #include <QOpenGLWidget>
 #include <QTime>
 #include <QTimer>
-
+#include "Building.h"
 class Realtime : public QOpenGLWidget
 {
 public:
@@ -35,6 +35,10 @@ public:
     void lightsHelper(std::vector<SceneLightData> lights, GLuint shader);
     void lightsColorHelper(std::vector<SceneLightData> lights, GLuint shader);
     int getNumberOfLights(std::vector<SceneLightData> lights);
+    // helper functions for final project:
+    void GenerateCity();
+    float getRandomFloat(float min, float max);
+    std::vector<float> generateRandomCubes();
 public slots:
     void tick(QTimerEvent* event);                      // Called once per tick of m_timer
 
@@ -155,5 +159,9 @@ private:
     int m_devicePixelRatio;
 
     RenderData metaData;
+
+    // below are fields for final project:
+    std::vector<glm::mat4> m_CTM_collection; // stores different CTMs for the cubes
+    std::vector<Building> m_building_arr; // stores the buildings
 
 };
