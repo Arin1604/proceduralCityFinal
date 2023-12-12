@@ -1,0 +1,56 @@
+# ninja log v5
+32	1225	7240619739418392	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+49	1160	7239587216418203	StaticGLEW_autogen/timestamp	37049cc562acb4a1
+194	246	7230879229074691	CMakeFiles/StaticGLEW.dir/StaticGLEW_autogen/mocs_compilation.cpp.obj	cf446afd33f9a36c
+49	1160	7239587216418203	StaticGLEW_autogen/mocs_compilation.cpp	37049cc562acb4a1
+49	1160	7239587216418203	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/StaticGLEW_autogen/timestamp	37049cc562acb4a1
+200	7256	7230879299156435	CMakeFiles/StaticGLEW.dir/glew/src/glew.c.obj	1593ed828eb91dba
+49	1160	7239587216418203	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/StaticGLEW_autogen/mocs_compilation.cpp	37049cc562acb4a1
+7258	7371	7230879300296854	libStaticGLEW.a	bd80415afac4a9a
+32	1225	7240619739418392	projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+32	1225	7240619739418392	projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+32	1225	7240619739418392	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+10	54	7240550322895398	.rcc/qrc_Resources.cpp	293db0f850e03af1
+10104	11578	7230879341869048	CMakeFiles/projects_realtime.dir/src/settings.cpp.obj	bc660a64ddf3b10e
+10	54	7240550322895398	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/.rcc/qrc_Resources.cpp	293db0f850e03af1
+10141	12636	7230879351756424	CMakeFiles/projects_realtime.dir/src/sphere.cpp.obj	e710d08038b4083e
+10165	12957	7230879355532677	CMakeFiles/projects_realtime.dir/src/cylinder.cpp.obj	8003c25b6365b793
+54	147	7240550323852510	CMakeFiles/projects_realtime.dir/.rcc/qrc_Resources.cpp.obj	272e1abd707a2b7c
+10124	15423	7230879380438007	CMakeFiles/projects_realtime.dir/src/cam.cpp.obj	d10488a96c966261
+11581	15766	7230879383745343	CMakeFiles/projects_realtime.dir/src/cone.cpp.obj	ee0f55e3f6a3c794
+12640	16174	7230879387797157	CMakeFiles/projects_realtime.dir/src/cube.cpp.obj	42c5fed8389e0757
+10026	19541	7230879421972518	CMakeFiles/projects_realtime.dir/src/utils/sceneparser.cpp.obj	d0fcdf8aa137a6a5
+6821	19388	7240617502918956	CMakeFiles/projects_realtime.dir/src/main.cpp.obj	30f4b6094b0ddf89
+6797	19569	7240617504655125	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.obj	e194077a49a8c7e2
+6893	21618	7240617525225712	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.obj	7065382390345fda
+10085	25335	7230879479931635	CMakeFiles/projects_realtime.dir/src/utils/scenefilereader.cpp.obj	804e7d318b34a7cd
+1297	16646	7240619893693400	CMakeFiles/projects_realtime.dir/src/realtime.cpp.obj	579d1f765eece1f
+16647	17219	7240619899320956	projects_realtime.exe	d27e6cb73ecb7889
+2919	4428	7240423400867192	CMakeFiles/projects_realtime.dir/src/snow.cpp.obj	38c99318b25064f8
+27	1290	7240620394822030	projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+27	1290	7240620394822030	projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+27	1290	7240620394822030	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+27	1290	7240620394822030	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+1366	17058	7240620552816619	CMakeFiles/projects_realtime.dir/src/realtime.cpp.obj	579d1f765eece1f
+17058	17509	7240620557262742	projects_realtime.exe	d27e6cb73ecb7889
+14	2727	7240651460659313	projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+14	2727	7240651460659313	projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+14	2727	7240651460659313	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+14	2727	7240651460659313	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+2728	2782	7240651463790402	.rcc/qrc_Resources.cpp	293db0f850e03af1
+2728	2782	7240651463790402	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/.rcc/qrc_Resources.cpp	293db0f850e03af1
+2837	2974	7240651465703993	CMakeFiles/projects_realtime.dir/.rcc/qrc_Resources.cpp.obj	272e1abd707a2b7c
+2792	12453	7240651560407996	CMakeFiles/projects_realtime.dir/src/main.cpp.obj	30f4b6094b0ddf89
+2782	12655	7240651562442191	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.obj	e194077a49a8c7e2
+2805	13786	7240651573832105	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.obj	7065382390345fda
+2823	16116	7240651597139170	CMakeFiles/projects_realtime.dir/src/realtime.cpp.obj	579d1f765eece1f
+16116	16444	7240651600331508	projects_realtime.exe	d27e6cb73ecb7889
+19	9375	7240653811717818	projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+19	9375	7240653811717818	projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+19	9375	7240653811717818	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/timestamp	7fbaa03bbc93a9ff
+19	9375	7240653811717818	C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/projects_realtime_autogen/mocs_compilation.cpp	7fbaa03bbc93a9ff
+9500	23512	7240653963518202	CMakeFiles/projects_realtime.dir/src/main.cpp.obj	30f4b6094b0ddf89
+9376	23707	7240653965480053	CMakeFiles/projects_realtime.dir/projects_realtime_autogen/mocs_compilation.cpp.obj	e194077a49a8c7e2
+9445	25339	7240653981758203	CMakeFiles/projects_realtime.dir/src/mainwindow.cpp.obj	7065382390345fda
+9406	28044	7240654008892151	CMakeFiles/projects_realtime.dir/src/realtime.cpp.obj	579d1f765eece1f
+28045	28515	7240654013514369	projects_realtime.exe	d27e6cb73ecb7889

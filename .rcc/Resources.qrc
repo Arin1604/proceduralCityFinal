@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="resources/shaders/default.frag">C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/resources/shaders/default.frag</file>
+    <file alias="resources/shaders/default.vert">C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/resources/shaders/default.vert</file>
+    <file alias="resources/shaders/texture.frag">C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/resources/shaders/texture.frag</file>
+    <file alias="resources/shaders/texture.vert">C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/resources/shaders/texture.vert</file>
+    <file alias="resources/shaders/hdr.frag">C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/resources/shaders/hdr.frag</file>
+    <file alias="resources/shaders/hdr.vert">C:/Users/drvij/OneDrive/Desktop/CSCI 1230 legit/projects-realtime-Arin1604/resources/shaders/hdr.vert</file>
+  </qresource>
+</RCC>
+
