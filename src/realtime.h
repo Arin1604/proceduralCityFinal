@@ -52,7 +52,7 @@ private:
     {
         glm::vec3 offset;
         int index;
-//        offset[2] = 0.9f
+        //        offset[2] = 0.9f
         int lifetime = 200/pow(offset[2],2);
         float particleIncrementor = offset[2];
         bool isAlive = true;
@@ -80,6 +80,9 @@ private:
     GLuint m_hdr_fbo;
     GLuint m_hdr_fbo_texture;
     GLuint m_hdr_fbo_renderbuffer;
+
+    GLuint m_blur_texture;
+    GLuint m_bloom_texture;
 
     QImage m_image;
     GLuint m_kitten_texture;

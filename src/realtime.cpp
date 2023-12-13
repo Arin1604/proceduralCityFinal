@@ -399,6 +399,11 @@ void Realtime::initializeGL() {
     glUseProgram(m_texture_shader);
     GLint location = glGetUniformLocation(m_texture_shader, "text");
     glUniform1i(location, 0);
+
+//    glUseProgram(m_texture_shader);
+//    GLint location1 = glGetUniformLocation(m_texture_shader, "blur");
+//    glUniform1i(location, 1);
+
     GLint locationScreenWidth = glGetUniformLocation(m_texture_shader, "screenW");
     glUniform1i(locationScreenWidth, m_screen_width);
     GLint locationScreenHeight = glGetUniformLocation(m_texture_shader, "screenH");
@@ -578,6 +583,45 @@ void Realtime::makeFBO(){
     glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//FINALCHANGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);//FINALCHANGE
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //Trying 3rd texture
+    glGenTextures(1, &m_blur_texture);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_blur_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//FINALCHANGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);//FINALCHANGE
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //Trying 4th texture
+    glGenTextures(1, &m_bloom_texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_bloom_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//FINALCHANGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);//FINALCHANGE
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -802,6 +846,8 @@ void Realtime::paintGL() {
     glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_fbo_width, m_fbo_height);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+
 
     //NORMAL CODE BEGINS
     glUseProgram(m_shader);
@@ -1078,32 +1124,8 @@ void Realtime::paintGL() {
     glUseProgram(0);
 
 
-    //TRYING TO MAKE TWO FBOS WORK TOGETHER
-    //    glBindFramebuffer(GL_FRAMEBUFFER, m_hdr_fbo);
-    //    //std::cout<<  "m_new_fbo" << m_new_fbo << std::endl;
-    //    //VIEWPORT STUFF
-    //    glViewport(0,0,  m_fbo_width,  m_fbo_height);
-
-    //    glActiveTexture(GL_TEXTURE1);
-    //    glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
-    //            particleRemover();
-    //        for(int i = 0; i < particles.size(); i++){
-
-    //            paintSnow(m_hdr_shader, m_view, m_proj, glm::vec3(0.7f, 0.7f, 0.7f), particles[i]);
-    //        }
 
 
-    //NORMAL CODE ENDS
-    //    paintSnow(m_texture_shader);
-
-
-
-
-
-
-    //FOR LAB11 THIS IS WHERE PAINTEXAMPLE GEOMETRY ENDS
-
-    //    makeHdrFBO();
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     //glBindFramebuffer(GL_FRAMEBUFFER, m_new_fbo);
@@ -1125,7 +1147,25 @@ void Realtime::paintGL() {
     }
 
 
-     paintTexture(m_new_fbo_texture, filterType);
+     paintTexture(m_new_fbo_texture, 3);
+
+    glBindTexture(GL_TEXTURE_2D, m_blur_texture);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_fbo_width, m_fbo_height);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    paintTexture(m_new_fbo_texture, filterType);
+
+    glBindTexture(GL_TEXTURE_2D, m_bloom_texture);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_fbo_width, m_fbo_height);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    paintTexture(m_blur_texture, 1);
+
+
 
 
 
@@ -1136,8 +1176,8 @@ void Realtime::paintGL() {
 void Realtime::paintTexture(GLuint texture, int process){
     glUseProgram(m_texture_shader);
     // Task 32: Set your bool uniform on whether or not to filter the texture drawn
-    //glGetUniformLocation(m_texture_shader, "inverter");
-    //glUniform1i(glGetUniformLocation(m_texture_shader, "inverter"), process);
+    glGetUniformLocation(m_texture_shader, "inverter");
+    glUniform1i(glGetUniformLocation(m_texture_shader, "inverter"), process);
 
     glBindVertexArray(m_fullscreen_vao);
     // Task 10: Bind "texture" to slot 0
@@ -1150,6 +1190,10 @@ void Realtime::paintTexture(GLuint texture, int process){
     glBindVertexArray(0);
     glUseProgram(0);
 }
+
+//void Realtime::paintFinal(GLuint texture1, GLuint texture2, int process){
+
+//}
 
 glm::mat4 translator(float dx, float dy, float dz){
     return glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, dx, dy, dz, 1);

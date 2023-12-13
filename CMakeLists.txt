@@ -89,6 +89,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/texture.vert
         resources/shaders/hdr.frag
         resources/shaders/hdr.vert
+        resources/shaders/final.frag
+        resources/shaders/final.vert
 
 )
 
