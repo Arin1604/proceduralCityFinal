@@ -16,6 +16,7 @@ void main()
     fragColor = vec4(1);
     // Task 17: Set fragColor using the sampler2D at the UV coordinate
     fragColor = texture(text, uvCoord);
+}
 
 //    if(inverter == 2){
 
@@ -47,34 +48,34 @@ void main()
 //    }
 
 //    if(inverter == 1){
-        float exposure = 5.f;
-        const float gamma = 2.2f;
-        vec3 hdr = texture(text, uvCoord).rgb;
+//        float exposure = 5.f;
+//        const float gamma = 2.2f;
+//        vec3 hdr = texture(text, uvCoord).rgb;
 
-        vec3 mapped = vec3(1.f) - exp(-hdr * exposure);
-        // gamma correction
-        mapped = pow(mapped, vec3(1.f / gamma));
-        fragColor = vec4(mapped, 1.f);
+//        vec3 mapped = vec3(1.f) - exp(-hdr * exposure);
+//        // gamma correction
+//        mapped = pow(mapped, vec3(1.f / gamma));
+//        fragColor = vec4(mapped, 1.f);
 
-        for(int i = -2; i <= 2; i++){
-            for(int j = -2; j <= 2; j++){
-                //            int currX = uPrime + i;
-                //            int currY = uPrime + j;
-                //            float currXUV = float(currX/screenW);
-                //            float currYUV = float(currY/screenH);
+//        for(int i = -2; i <= 2; i++){
+//            for(int j = -2; j <= 2; j++){
+//                //            int currX = uPrime + i;
+//                //            int currY = uPrime + j;
+//                //            float currXUV = float(currX/screenW);
+//                //            float currYUV = float(currY/screenH);
 
-                //            vec2 newUV = vec2(currXUV, currYUV);
-                float scale = 1/ sqrt((screenH * screenW));
-                vec2 offset = vec2(i,j) * 0.003;
+//                //            vec2 newUV = vec2(currXUV, currYUV);
+//                float scale = 1/ sqrt((screenH * screenW));
+//                vec2 offset = vec2(i,j) * 0.003;
 
-                fragColor += texture(text, uvCoord + offset);
-            }
-        }
+//                fragColor += texture(text, uvCoord + offset);
+//            }
+//        }
 
-        fragColor /= 25.f;
+//        fragColor /= 25.f;
 
 
-    }
+//    }
 
 
 
