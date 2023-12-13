@@ -145,7 +145,7 @@
 
 void cone::updateParams(int param1) {
     m_vertexData = std::vector<float>();
-    m_param1 = 3 * param1;
+    m_param1 = 3 * 5;
     setVertexData();
 }
 

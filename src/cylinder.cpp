@@ -8,7 +8,7 @@ void cylinder::updateParams(int param1, int param2) {
     if (param2 < 2) {
         param_2 = 4;
     }
-    m_param1 = 3 * param1;
+    m_param1 = 18;
     m_param2 = param_2;
     setVertexData();
 }
