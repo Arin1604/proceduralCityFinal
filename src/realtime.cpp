@@ -289,9 +289,9 @@ void Realtime::initializeGL() {
 
     }
 
-//    for(int i = 0; i < particles.size(); i++){
-//        std::cout << particles[i].index << std::endl;
-//    }
+    //    for(int i = 0; i < particles.size(); i++){
+    //        std::cout << particles[i].index << std::endl;
+    //    }
 
 
 
@@ -328,6 +328,11 @@ void Realtime::initializeGL() {
     GLint hdrLoc = glGetUniformLocation(m_hdr_shader, "hdr_texture");
     glUniform1i(location, 0);
     glUseProgram(0);
+
+    //    glUseProgram(m_hdr_shader);
+    //    GLint snowLoc = glGetUniformLocation(m_hdr_shader, "snowText");
+    //    glUniform1i(location, 0);
+    //    glUseProgram(0);
 
     std::vector<GLfloat> fullscreen_quad_data =
         { //     POSITIONS    //
@@ -483,6 +488,22 @@ void Realtime::makeFBO(){
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    //trying second texture
+    glGenTextures(1, &m_hdr_fbo_texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//FINALCHANGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);//FINALCHANGE
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
 
 
     // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
@@ -499,16 +520,44 @@ void Realtime::makeFBO(){
 
     // Task 21: Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_new_fbo_texture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_hdr_fbo_texture, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_new_fbo_renderbuffer);
     // Task 22: Unbind the FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+    //Trying to work with two FBOs
+    //glGenFramebuffers(1, &m_hdr_fbo);             //ERROR HAPPENS HERE, generating FBO FUCKS US UP
+
+    //    glBindFramebuffer(GL_FRAMEBUFFER, m_hdr_fbo);//generating hdr fbo
+
+    //Generating new textures
+    //    glGenTextures(1, &m_hdr_fbo_texture);
+    //    glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
+    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//FINALCHANGE
+    //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);//FINALCHANGE
+
+    //    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    //    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_hdr_fbo_texture, 0);
+    //    glBindTexture(GL_TEXTURE_2D, 0);
+    //    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+
+
+}
+
+void Realtime::snowBinder(){
+    glGenTextures(1, &m_hdr_fbo_texture);
+    glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
 
 
 }
 
 void Realtime::makeHdrFBO(){
     glGenTextures(1, &m_hdr_fbo_texture);
-    glActiveTexture(GL_TEXTURE0);//look into
+    glActiveTexture(GL_TEXTURE1);//look into
     glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
@@ -653,8 +702,22 @@ void Realtime::paintGL() {
     //FOR LAB11 THIS IS WHERE PAINTEXAMPLE GEOMETRY BEGINS
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    particleRemover();
+    for(int i = 0; i < particles.size(); i++){
+
+        paintSnow(m_new_fbo_texture, m_view, m_proj, glm::vec3(0.7f, 0.7f, 0.7f), particles[i]);
+    }
+
+    glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_fbo_width, m_fbo_height);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     //NORMAL CODE BEGINS
     glUseProgram(m_shader);
+
+    //setting texture
+
+
 
     //for(int i = 0; i < metaData.shapes.size(); i++){
 
@@ -778,6 +841,21 @@ void Realtime::paintGL() {
     glUseProgram(0);
 
 
+    //TRYING TO MAKE TWO FBOS WORK TOGETHER
+    //    glBindFramebuffer(GL_FRAMEBUFFER, m_hdr_fbo);
+    //    //std::cout<<  "m_new_fbo" << m_new_fbo << std::endl;
+    //    //VIEWPORT STUFF
+    //    glViewport(0,0,  m_fbo_width,  m_fbo_height);
+
+    //    glActiveTexture(GL_TEXTURE1);
+    //    glBindTexture(GL_TEXTURE_2D, m_hdr_fbo_texture);
+    //            particleRemover();
+    //        for(int i = 0; i < particles.size(); i++){
+
+    //            paintSnow(m_hdr_shader, m_view, m_proj, glm::vec3(0.7f, 0.7f, 0.7f), particles[i]);
+    //        }
+
+
     //NORMAL CODE ENDS
     //    paintSnow(m_texture_shader);
 
@@ -809,13 +887,13 @@ void Realtime::paintGL() {
         filterType = 2;
     }
 
-    // paintTexture(m_new_fbo_texture, filterType);
+    paintTexture(m_new_fbo_texture, filterType);
 
-        particleRemover();
-    for(int i = 0; i < particles.size(); i++){
+    //        particleRemover();
+    //    for(int i = 0; i < particles.size(); i++){
 
-        paintSnow(m_hdr_shader, m_view, m_proj, glm::vec3(0.7f, 0.7f, 0.7f), particles[i]);
-    }
+    //        paintSnow(m_hdr_fbo_texture, m_view, m_proj, glm::vec3(0.7f, 0.7f, 0.7f), particles[i]);
+    //    }
 
 
 
@@ -850,20 +928,20 @@ void Realtime::particleRemover(){
 
     std::sort(particles.begin(), particles.end(), particle);
 
-//    if(particles.end()->isAlive == 0){
-//        particles.pop_back();
-//        float xOffset = -1.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(-1.f))));
-//        float yOffset = -1.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(-1.f))));
-//        float zOffset = 0.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(0.f))));
-//        //particles.begin()
+    //    if(particles.end()->isAlive == 0){
+    //        particles.pop_back();
+    //        float xOffset = -1.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(-1.f))));
+    //        float yOffset = -1.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(-1.f))));
+    //        float zOffset = 0.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(0.f))));
+    //        //particles.begin()
 
 
-//        addParticle(xOffset, yOffset, zOffset, particles.size()-1);
-//    }
+    //        addParticle(xOffset, yOffset, zOffset, particles.size()-1);
+    //    }
 
     for(int i = 0; i < particles.size(); i++){
-    if(particles[i].isAlive == 0){
-        particles.pop_back();
+        if(particles[i].isAlive == 0){
+            particles.pop_back();
             float xOffset = -1.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(-1.f))));
             float yOffset = -1.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(-1.f))));
             float zOffset = 0.f + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1.f-(0.f))));
@@ -871,7 +949,7 @@ void Realtime::particleRemover(){
 
 
             addParticle(xOffset, -1.0f, zOffset, particles.size()-1);
-    }
+        }
 
     }
 
@@ -959,6 +1037,10 @@ void Realtime::paintSnow(GLuint texture, glm::mat4 view, glm::mat4 proj, glm::ve
 void Realtime::resizeGL(int w, int h) {
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+
+    //    glDeleteTextures(1, &m_new_fbo_texture);
+    //    glDeleteRenderbuffers(1, &m_new_fbo_renderbuffer);
+    //    glDeleteFramebuffers(1, &m_n)
 
     projWidth = w;
     projHeight = h;
@@ -1132,7 +1214,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
                 particles[i].isAlive = false;
             }
 
-                    //std::cout << particles[i].isAlive << std::endl;
+            //std::cout << particles[i].isAlive << std::endl;
         }
 
 

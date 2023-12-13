@@ -6,6 +6,7 @@ in vec3 loc;
 
 
 uniform sampler2D hdr_texture;
+//uniform sampler2D snowText;
 
 
 out vec4 fragColor;

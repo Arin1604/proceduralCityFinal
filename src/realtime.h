@@ -131,6 +131,7 @@ private:
     void paintSnow(GLuint shader, glm::mat4 view, glm::mat4 proj, glm::vec3 offset, Particle currPart);
     void makeFBO();
     void makeHdrFBO();
+    void snowBinder();
     void particleRemover();
     void addParticle(float x, float y, float z, int i);
     void removeParticle(int i);
