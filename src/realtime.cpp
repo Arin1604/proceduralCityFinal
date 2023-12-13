@@ -141,7 +141,7 @@ void Realtime::GenerateCity() {
     // if the random building generator tries X times and still overalps with some buildings,
     // then the city might be too crowded, we should stop adding new Buildings
     int overlapThreshold = 100;
-    for(int i = 0; i < 130;){
+    for(int i = 0; i < 200;){
         float random_scale_x = getRandomFloat(0.8f, 1.5f);
         float random_scale_y = getRandomFloat(1.0f, 3.5f);
         float random_scale_z = getRandomFloat(0.8f, 1.5f);
