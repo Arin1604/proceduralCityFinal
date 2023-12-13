@@ -6,8 +6,11 @@ Building::Building(glm::vec3 pos, glm::vec3 size){
     position = pos;
     size = size;
     glm::mat4 random_transform_matrix = glm::mat4(1.0f);
-    glm::mat4 scaleM = glm::scale(random_transform_matrix, size);
     glm::mat4 translateM = glm::translate(random_transform_matrix, pos);
+    trans_mat = translateM;
+    glm::mat4 scaleM = glm::scale(random_transform_matrix, size);
+    randy = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
     CTM = translateM * scaleM;
     std::pair<float, float> bx(pos[0]-size[0]*0.5f,pos[0]+size[0]*0.5f);
     boundX = bx;

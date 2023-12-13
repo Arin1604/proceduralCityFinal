@@ -10,7 +10,9 @@ public:
     ~Building() = default; // deconstructor
     Building(const Building&) = default; // default copy constructor
     bool checkOverlap(Building& B);
+    float randy; // serves as type
     glm::mat4 CTM; // The CTM that scale&translate the unit cube to destination
+    glm::mat4 trans_mat; // translation matrix only, used for light generation
     glm::vec3 position; // The translate vector that translate the unit cube to the destination
     glm::vec3 size; // The scale vector
     std::pair<float, float> boundX; // the x-axis bound of the building
