@@ -384,6 +384,7 @@ void Realtime::initializeGL() {
 
     m_hdr_shader =  ShaderLoader::createShaderProgram(":/resources/shaders/hdr.vert", ":/resources/shaders/hdr.frag");
 
+    m_final_shader =  ShaderLoader::createShaderProgram(":/resources/shaders/final.vert", ":/resources/shaders/final.frag");
 
     //QString kitten_filepath = QString(":/resources/kitten.png");
 
@@ -400,14 +401,24 @@ void Realtime::initializeGL() {
     GLint location = glGetUniformLocation(m_texture_shader, "text");
     glUniform1i(location, 0);
 
-//    glUseProgram(m_texture_shader);
-//    GLint location1 = glGetUniformLocation(m_texture_shader, "blur");
-//    glUniform1i(location, 1);
+    //    glUseProgram(m_texture_shader);
+    //    GLint location1 = glGetUniformLocation(m_texture_shader, "blur");
+    //    glUniform1i(location, 1);
 
     GLint locationScreenWidth = glGetUniformLocation(m_texture_shader, "screenW");
     glUniform1i(locationScreenWidth, m_screen_width);
     GLint locationScreenHeight = glGetUniformLocation(m_texture_shader, "screenH");
     glUniform1i(locationScreenHeight, m_screen_height);
+
+    glUseProgram(0);
+
+    glUseProgram(m_final_shader);
+    GLint text1Loc = glGetUniformLocation(m_final_shader, "texte");
+    glUniform1i(text1Loc, 0);
+
+    GLint text2Loc = glGetUniformLocation(m_final_shader, "blur");
+    glUniform1i(text2Loc, 1);
+
 
     glUseProgram(0);
 
@@ -872,252 +883,252 @@ void Realtime::paintGL() {
 
 
 
-     //if(metaData.shapes.size() != 0){
-        // ****TO DO: PASS IN MODEL MATRIX AS UNIFORM
-        // PASS IN ALL YOUR UNIFORMS
-        for(int i = 0; i < metaData.shapes.size(); i++){
-            float triangles;
+    //if(metaData.shapes.size() != 0){
+    // ****TO DO: PASS IN MODEL MATRIX AS UNIFORM
+    // PASS IN ALL YOUR UNIFORMS
+    for(int i = 0; i < metaData.shapes.size(); i++){
+        float triangles;
 
-            switch (metaData.shapes[i].primitive.type) {
-            case PrimitiveType::PRIMITIVE_CUBE:
-                glBindVertexArray(m_cube_vao);
-                triangles = templateCubeData.size()/6;
-                break;
-            case PrimitiveType::PRIMITIVE_SPHERE:
-                glBindVertexArray(m_sphere_vao);
-                triangles = templateSphereData.size()/6;
+        switch (metaData.shapes[i].primitive.type) {
+        case PrimitiveType::PRIMITIVE_CUBE:
+            glBindVertexArray(m_cube_vao);
+            triangles = templateCubeData.size()/6;
+            break;
+        case PrimitiveType::PRIMITIVE_SPHERE:
+            glBindVertexArray(m_sphere_vao);
+            triangles = templateSphereData.size()/6;
 
-                break;
-            case PrimitiveType::PRIMITIVE_CYLINDER:
-                glBindVertexArray(m_cylinder_vao); //FIX THIS
-                triangles = templateCylinderData.size()/6;//FIX THIS
+            break;
+        case PrimitiveType::PRIMITIVE_CYLINDER:
+            glBindVertexArray(m_cylinder_vao); //FIX THIS
+            triangles = templateCylinderData.size()/6;//FIX THIS
 
-                break;
-            case PrimitiveType::PRIMITIVE_CONE:
-                glBindVertexArray(m_cone_vao); //FIX THIS
-                triangles = templateConeData.size()/6;//FIX THIS
+            break;
+        case PrimitiveType::PRIMITIVE_CONE:
+            glBindVertexArray(m_cone_vao); //FIX THIS
+            triangles = templateConeData.size()/6;//FIX THIS
 
-                break;
-            case PrimitiveType::PRIMITIVE_MESH:
-                glBindVertexArray(m_sphere_vao); //FIX THIS
+            break;
+        case PrimitiveType::PRIMITIVE_MESH:
+            glBindVertexArray(m_sphere_vao); //FIX THIS
 
-                break;
-            }
-
-
-            GLint modelMatlocation = glGetUniformLocation(m_shader, "modelMat");
-            glUniformMatrix4fv(modelMatlocation, 1, GL_FALSE, /*&m_modelTest[0][0]*/&metaData.shapes[i].ctm[0][0]);// using metadata causes program to crash
-
-            GLint viewMatLocation = glGetUniformLocation(m_shader, "viewMat");
-            glUniformMatrix4fv(viewMatLocation, 1, GL_FALSE, &m_view[0][0]); //passing in the right matrix messes stuff up
-
-            GLint projMatLocation = glGetUniformLocation(m_shader, "projMat");
-            glUniformMatrix4fv(projMatLocation, 1, GL_FALSE, &m_proj[0][0]); //passing in the right matrix messes stuff up
-
-            GLint locationAmb = glGetUniformLocation(m_shader, "k_A");
-            glUniform1f(locationAmb, metaData.globalData.ka);
-
-            GLint locationDif = glGetUniformLocation(m_shader, "k_D");
-            glUniform1f(locationDif, metaData.globalData.kd);
-
-            GLint locationSpec = glGetUniformLocation(m_shader, "k_S");
-            glUniform1f(locationSpec, metaData.globalData.ks);
-
-            //            metaData.cameraData.pos
-
-            glm::vec4 camPos = glm::inverse(m_view) * metaData.cameraData.pos;
-            GLint locationCameraPos = glGetUniformLocation(m_shader, "cameraPos");
-            glUniform4fv(locationCameraPos, 1 , &camPos[0]);
-
-            GLint shineLoc = glGetUniformLocation(m_shader, "shine");
-            glUniform1f(shineLoc , metaData.shapes[i].primitive.material.shininess);
+            break;
+        }
 
 
-            // Multiple light stuff
-            int lightSize = getNumberOfLights(metaData.lights) + m_building_arr.size();
+        GLint modelMatlocation = glGetUniformLocation(m_shader, "modelMat");
+        glUniformMatrix4fv(modelMatlocation, 1, GL_FALSE, /*&m_modelTest[0][0]*/&metaData.shapes[i].ctm[0][0]);// using metadata causes program to crash
+
+        GLint viewMatLocation = glGetUniformLocation(m_shader, "viewMat");
+        glUniformMatrix4fv(viewMatLocation, 1, GL_FALSE, &m_view[0][0]); //passing in the right matrix messes stuff up
+
+        GLint projMatLocation = glGetUniformLocation(m_shader, "projMat");
+        glUniformMatrix4fv(projMatLocation, 1, GL_FALSE, &m_proj[0][0]); //passing in the right matrix messes stuff up
+
+        GLint locationAmb = glGetUniformLocation(m_shader, "k_A");
+        glUniform1f(locationAmb, metaData.globalData.ka);
+
+        GLint locationDif = glGetUniformLocation(m_shader, "k_D");
+        glUniform1f(locationDif, metaData.globalData.kd);
+
+        GLint locationSpec = glGetUniformLocation(m_shader, "k_S");
+        glUniform1f(locationSpec, metaData.globalData.ks);
+
+        //            metaData.cameraData.pos
+
+        glm::vec4 camPos = glm::inverse(m_view) * metaData.cameraData.pos;
+        GLint locationCameraPos = glGetUniformLocation(m_shader, "cameraPos");
+        glUniform4fv(locationCameraPos, 1 , &camPos[0]);
+
+        GLint shineLoc = glGetUniformLocation(m_shader, "shine");
+        glUniform1f(shineLoc , metaData.shapes[i].primitive.material.shininess);
 
 
-            //Now make this work for all lights
-            //Passing actual data into the structs
-            lightsHelper(metaData.lights, m_shader);//888 MAJOR CHANGES HERE
-            lightsColorHelper(metaData.lights, m_shader);//888 MAJOR CHANGES HERE
-
-            //std::cout<< lightDirSize << std::endl;
-            GLint locationArraySize = glGetUniformLocation(m_shader, "arraySize");
-            glUniform1i(locationArraySize, lightSize);
-
-            //end multiple light stuff
+        // Multiple light stuff
+        int lightSize = getNumberOfLights(metaData.lights) + m_building_arr.size();
 
 
-            // std::cout << metaData.shapes[2].primitive.material.cAmbient[0] << metaData.shapes[2].primitive.material.cAmbient[1] << metaData.shapes[2].primitive.material.cAmbient[2] <<std::endl;
-            GLint ambientColorLoc = glGetUniformLocation(m_shader, "m_A");
-            glUniform3fv(ambientColorLoc, 1, &metaData.shapes[i].primitive.material.cAmbient[0]);
+        //Now make this work for all lights
+        //Passing actual data into the structs
+        lightsHelper(metaData.lights, m_shader);//888 MAJOR CHANGES HERE
+        lightsColorHelper(metaData.lights, m_shader);//888 MAJOR CHANGES HERE
 
-            GLint specularColorLoc = glGetUniformLocation(m_shader, "m_S");
-            glUniform3fv(specularColorLoc, 1, &metaData.shapes[i].primitive.material.cSpecular[0]);
+        //std::cout<< lightDirSize << std::endl;
+        GLint locationArraySize = glGetUniformLocation(m_shader, "arraySize");
+        glUniform1i(locationArraySize, lightSize);
 
-            GLint diffuseColorLoc = glGetUniformLocation(m_shader, "m_D");
-            glUniform3fv(diffuseColorLoc, 1, &metaData.shapes[i].primitive.material.cDiffuse[0]);
+        //end multiple light stuff
 
-            glDrawArrays(GL_TRIANGLES, 0, triangles);
-            glBindVertexArray(0);
 
-            // -----------final project part---------------------//
+        // std::cout << metaData.shapes[2].primitive.material.cAmbient[0] << metaData.shapes[2].primitive.material.cAmbient[1] << metaData.shapes[2].primitive.material.cAmbient[2] <<std::endl;
+        GLint ambientColorLoc = glGetUniformLocation(m_shader, "m_A");
+        glUniform3fv(ambientColorLoc, 1, &metaData.shapes[i].primitive.material.cAmbient[0]);
 
-            // paint the ground plain:
-            glm::mat4 groundCTM = m_CTM_collection[0];
-            glm::vec4 Ambient = glm::vec4(1.0,1.0,1.0,0.0);
-            glm::vec4 Diffuse = glm::vec4(0.7,0.7,0.7,0.0);
-            // glm::vec4 Specular = glm::vec4(1.0,1.0,1.0,0.0);
-            GLint locationM = glGetUniformLocation(m_shader,"modelMat");
-            glUniformMatrix4fv(locationM,1,GL_FALSE,&groundCTM[0][0]);
+        GLint specularColorLoc = glGetUniformLocation(m_shader, "m_S");
+        glUniform3fv(specularColorLoc, 1, &metaData.shapes[i].primitive.material.cSpecular[0]);
+
+        GLint diffuseColorLoc = glGetUniformLocation(m_shader, "m_D");
+        glUniform3fv(diffuseColorLoc, 1, &metaData.shapes[i].primitive.material.cDiffuse[0]);
+
+        glDrawArrays(GL_TRIANGLES, 0, triangles);
+        glBindVertexArray(0);
+
+        // -----------final project part---------------------//
+
+        // paint the ground plain:
+        glm::mat4 groundCTM = m_CTM_collection[0];
+        glm::vec4 Ambient = glm::vec4(1.0,1.0,1.0,0.0);
+        glm::vec4 Diffuse = glm::vec4(0.7,0.7,0.7,0.0);
+        // glm::vec4 Specular = glm::vec4(1.0,1.0,1.0,0.0);
+        GLint locationM = glGetUniformLocation(m_shader,"modelMat");
+        glUniformMatrix4fv(locationM,1,GL_FALSE,&groundCTM[0][0]);
+        GLint locations = glGetUniformLocation(m_shader,"shine");
+        glUniform1f(locations,15);
+        GLint locationcA = glGetUniformLocation(m_shader,"m_A");
+        // glUniform4fv(locationcA,1,&Ambient[0]);
+        GLint locationcD = glGetUniformLocation(m_shader,"m_D");
+        glUniform4fv(locationcD,1,&Diffuse[0]);
+        GLint locationcS = glGetUniformLocation(m_shader,"m_S");
+        // glUniform4fv(locationcS,1,&Specular[0]);
+        glBindVertexArray(m_cube_vao);
+        triangles = templateCubeData.size()/6;
+        glDrawArrays(GL_TRIANGLES, 0, triangles);
+        glBindVertexArray(0);
+
+
+        // paint the street:
+        for(int i = 0; i < 5; i++){
+            glm::mat4 CTM = m_building_arr[i].CTM;
+            glm::vec4 Ambient = glm::vec4(0.0,0.5,0.5,0.0);
+            glm::vec4 Diffuse = glm::vec4(0.0,0.7,0.7,0.0);
+            // glm::vec4 Specular = glm::vec4(1.0,1.0,1.0,1.0);
+            GLint locationM = glGetUniformLocation(m_shader,"modelM");
+            glUniformMatrix4fv(locationM,1,GL_FALSE,&CTM[0][0]);
+            glm::mat4 MVP = m_proj * m_view * CTM;
+            GLint locationMVP = glGetUniformLocation(m_shader, "MVP");
+            glUniformMatrix4fv(locationMVP,1,GL_FALSE,&MVP[0][0]);
             GLint locations = glGetUniformLocation(m_shader,"shine");
-            glUniform1f(locations,15);
+            glUniform1f(locations,0);
             GLint locationcA = glGetUniformLocation(m_shader,"m_A");
-            // glUniform4fv(locationcA,1,&Ambient[0]);
+            glUniform4fv(locationcA,1,&Ambient[0]);
             GLint locationcD = glGetUniformLocation(m_shader,"m_D");
             glUniform4fv(locationcD,1,&Diffuse[0]);
-            GLint locationcS = glGetUniformLocation(m_shader,"m_S");
-            // glUniform4fv(locationcS,1,&Specular[0]);
+            //            GLint locationcS = glGetUniformLocation(m_shader,"m_S");
+            //            glUniform4fv(locationcS,1,&Specular[0]);
             glBindVertexArray(m_cube_vao);
             triangles = templateCubeData.size()/6;
             glDrawArrays(GL_TRIANGLES, 0, triangles);
             glBindVertexArray(0);
+        }
+
+        // generate a light within each bulding
+        int lightStart = metaData.lights.size();
+        int building_index = 0;
+        glm::vec3 nullVec = glm::vec3(0.0, 0.0, 0.0);
+        glm::vec3 color = glm::vec3(0.5, 0.5, 0.25);
+        glm::vec3 atten = glm::vec3(0.05, 0.8, 2.0);
+        for (int i = lightStart; i < (m_building_arr.size() + lightStart); i++) {
+            // get current buliding ctm
+            // use to generate a light position
 
 
-            // paint the street:
-            for(int i = 0; i < 5; i++){
-                glm::mat4 CTM = m_building_arr[i].CTM;
-                glm::vec4 Ambient = glm::vec4(0.0,0.5,0.5,0.0);
-                glm::vec4 Diffuse = glm::vec4(0.0,0.7,0.7,0.0);
-                // glm::vec4 Specular = glm::vec4(1.0,1.0,1.0,1.0);
-                GLint locationM = glGetUniformLocation(m_shader,"modelM");
-                glUniformMatrix4fv(locationM,1,GL_FALSE,&CTM[0][0]);
-                glm::mat4 MVP = m_proj * m_view * CTM;
-                GLint locationMVP = glGetUniformLocation(m_shader, "MVP");
-                glUniformMatrix4fv(locationMVP,1,GL_FALSE,&MVP[0][0]);
-                GLint locations = glGetUniformLocation(m_shader,"shine");
-                glUniform1f(locations,0);
-                GLint locationcA = glGetUniformLocation(m_shader,"m_A");
-                glUniform4fv(locationcA,1,&Ambient[0]);
-                GLint locationcD = glGetUniformLocation(m_shader,"m_D");
-                glUniform4fv(locationcD,1,&Diffuse[0]);
-                //            GLint locationcS = glGetUniformLocation(m_shader,"m_S");
-                //            glUniform4fv(locationcS,1,&Specular[0]);
+
+            glm::vec3 position(m_building_arr[i].position[0] + 0.3, m_building_arr[i].position[1] - 1.f, m_building_arr[i].position[2] - 0.3);
+
+
+            std::string s = "lights[" + std::to_string(i) + "].type"; //look into implementing multiple lights
+            GLint locType = glGetUniformLocation(m_shader, s.c_str());
+
+            std::string sCol = "lights[" + std::to_string(i) + "].color"; //look into implementing multiple lights
+            GLint locColor = glGetUniformLocation(m_shader, sCol.c_str());
+
+            std::string sAtt = "lights[" + std::to_string(i) + "].attenuation"; //look into implementing multiple lights
+            GLint locAtt = glGetUniformLocation(m_shader, sAtt.c_str());
+
+            std::string sPos = "lights[" + std::to_string(i) + "].pos"; //look into implementing multiple lights
+            GLint locPos = glGetUniformLocation(m_shader, sPos.c_str());
+
+            std::string sDir = "lights[" + std::to_string(i) + "].dir"; //look into implementing multiple lights
+            GLint locDir = glGetUniformLocation(m_shader, sDir.c_str());
+
+            std::string sPen = "lights[" + std::to_string(i) + "].penumbra"; //look into implementing multiple lights
+            GLint locPen = glGetUniformLocation(m_shader, sPen.c_str());
+
+            std::string sAng = "lights[" + std::to_string(i) + "].angle"; //look into implementing multiple lights
+            GLint locAng = glGetUniformLocation(m_shader, sAng.c_str());
+
+            //position = glm::vec3(1.f, 1.f, 1.f);
+
+
+            glUniform1i(locType, 1);
+
+
+            glUniform1f(locAng, 0.f);
+
+
+            glUniform1f(locPen, 0.f);
+
+            glUniform3fv(locDir, 1, &nullVec[0]);
+
+
+
+            glUniform3fv(locColor, 1, &color[0]);
+
+
+
+            glUniform3fv(locAtt, 1, &atten[0]);
+
+
+
+            glUniform3fv(locPos, 1, &position[0]);
+
+
+
+
+            building_index++;
+        }
+
+        // paint all the buildings
+        for(int i = 0; i < m_building_arr.size(); i++){
+            glm::mat4 CTM = m_building_arr[i].CTM;
+            glm::vec4 Ambient = glm::vec4(0.5,0.5,0.5,0.0);
+            glm::vec4 Diffuse = glm::vec4(0.7,0.7,0.5,0.0);
+            glm::vec4 Specular = glm::vec4(0.2,0.2,0.2,1.0);
+            GLint locationM = glGetUniformLocation(m_shader,"modelMat");
+            glUniformMatrix4fv(locationM,1,GL_FALSE,&CTM[0][0]);
+            GLint locations = glGetUniformLocation(m_shader,"shine");
+            glUniform1f(locations,0);
+            GLint locationcA = glGetUniformLocation(m_shader,"m_A");
+            glUniform4fv(locationcA,1,&Ambient[0]);
+            GLint locationcD = glGetUniformLocation(m_shader,"m_D");
+            glUniform4fv(locationcD,1,&Diffuse[0]);
+            GLint locationcS = glGetUniformLocation(m_shader,"m_S");
+            glUniform4fv(locationcS,1,&Specular[0]);
+
+            float r = m_building_arr[i].randy;
+            if (r < 0.5) {
                 glBindVertexArray(m_cube_vao);
                 triangles = templateCubeData.size()/6;
                 glDrawArrays(GL_TRIANGLES, 0, triangles);
-                glBindVertexArray(0);
+            } else if (r < 0.75) {
+                glBindVertexArray(m_cylinder_vao);
+                triangles = templateCylinderData.size()/6;
+                glDrawArrays(GL_TRIANGLES, 0, triangles);
+            } else {
+                glBindVertexArray(m_cone_vao);
+                triangles = templateConeData.size()/6;
+                glDrawArrays(GL_TRIANGLES, 0, triangles);
             }
-
-            // generate a light within each bulding
-            int lightStart = metaData.lights.size();
-            int building_index = 0;
-            glm::vec3 nullVec = glm::vec3(0.0, 0.0, 0.0);
-            glm::vec3 color = glm::vec3(0.5, 0.5, 0.25);
-            glm::vec3 atten = glm::vec3(0.05, 0.8, 2.0);
-            for (int i = lightStart; i < (m_building_arr.size() + lightStart); i++) {
-                // get current buliding ctm
-                // use to generate a light position
-
-
-
-                glm::vec3 position(m_building_arr[i].position[0] + 0.3, m_building_arr[i].position[1] - 1.f, m_building_arr[i].position[2] - 0.3);
-
-
-                std::string s = "lights[" + std::to_string(i) + "].type"; //look into implementing multiple lights
-                GLint locType = glGetUniformLocation(m_shader, s.c_str());
-
-                std::string sCol = "lights[" + std::to_string(i) + "].color"; //look into implementing multiple lights
-                GLint locColor = glGetUniformLocation(m_shader, sCol.c_str());
-
-                std::string sAtt = "lights[" + std::to_string(i) + "].attenuation"; //look into implementing multiple lights
-                GLint locAtt = glGetUniformLocation(m_shader, sAtt.c_str());
-
-                std::string sPos = "lights[" + std::to_string(i) + "].pos"; //look into implementing multiple lights
-                GLint locPos = glGetUniformLocation(m_shader, sPos.c_str());
-
-                std::string sDir = "lights[" + std::to_string(i) + "].dir"; //look into implementing multiple lights
-                GLint locDir = glGetUniformLocation(m_shader, sDir.c_str());
-
-                std::string sPen = "lights[" + std::to_string(i) + "].penumbra"; //look into implementing multiple lights
-                GLint locPen = glGetUniformLocation(m_shader, sPen.c_str());
-
-                std::string sAng = "lights[" + std::to_string(i) + "].angle"; //look into implementing multiple lights
-                GLint locAng = glGetUniformLocation(m_shader, sAng.c_str());
-
-                //position = glm::vec3(1.f, 1.f, 1.f);
-
-
-                glUniform1i(locType, 1);
-
-
-                glUniform1f(locAng, 0.f);
-
-
-                glUniform1f(locPen, 0.f);
-
-                glUniform3fv(locDir, 1, &nullVec[0]);
-
-
-
-                glUniform3fv(locColor, 1, &color[0]);
-
-
-
-                glUniform3fv(locAtt, 1, &atten[0]);
-
-
-
-                glUniform3fv(locPos, 1, &position[0]);
-
-
-
-
-                building_index++;
-            }
-
-            // paint all the buildings
-            for(int i = 0; i < m_building_arr.size(); i++){
-                glm::mat4 CTM = m_building_arr[i].CTM;
-                glm::vec4 Ambient = glm::vec4(0.5,0.5,0.5,0.0);
-                glm::vec4 Diffuse = glm::vec4(0.7,0.7,0.5,0.0);
-                glm::vec4 Specular = glm::vec4(0.2,0.2,0.2,1.0);
-                GLint locationM = glGetUniformLocation(m_shader,"modelMat");
-                glUniformMatrix4fv(locationM,1,GL_FALSE,&CTM[0][0]);
-                GLint locations = glGetUniformLocation(m_shader,"shine");
-                glUniform1f(locations,0);
-                GLint locationcA = glGetUniformLocation(m_shader,"m_A");
-                glUniform4fv(locationcA,1,&Ambient[0]);
-                GLint locationcD = glGetUniformLocation(m_shader,"m_D");
-                glUniform4fv(locationcD,1,&Diffuse[0]);
-                GLint locationcS = glGetUniformLocation(m_shader,"m_S");
-                glUniform4fv(locationcS,1,&Specular[0]);
-
-                float r = m_building_arr[i].randy;
-                if (r < 0.5) {
-                    glBindVertexArray(m_cube_vao);
-                    triangles = templateCubeData.size()/6;
-                    glDrawArrays(GL_TRIANGLES, 0, triangles);
-                } else if (r < 0.75) {
-                    glBindVertexArray(m_cylinder_vao);
-                    triangles = templateCylinderData.size()/6;
-                    glDrawArrays(GL_TRIANGLES, 0, triangles);
-                } else {
-                    glBindVertexArray(m_cone_vao);
-                    triangles = templateConeData.size()/6;
-                    glDrawArrays(GL_TRIANGLES, 0, triangles);
-                }
-                glBindVertexArray(0);
-
-
-
-            }
-            // ----------final project-----------------------//
+            glBindVertexArray(0);
 
 
 
         }
+        // ----------final project-----------------------//
+
+
+
+    }
     // }
 
     // Unbind the shader
@@ -1147,7 +1158,7 @@ void Realtime::paintGL() {
     }
 
 
-     paintTexture(m_new_fbo_texture, 3);
+    paintTexture(m_new_fbo_texture, 3);
 
     glBindTexture(GL_TEXTURE_2D, m_blur_texture);
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_fbo_width, m_fbo_height);
@@ -1164,6 +1175,10 @@ void Realtime::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     paintTexture(m_blur_texture, 1);
+
+     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    paintFinal(m_new_fbo_texture, m_blur_texture, 2);
 
 
 
@@ -1191,9 +1206,23 @@ void Realtime::paintTexture(GLuint texture, int process){
     glUseProgram(0);
 }
 
-//void Realtime::paintFinal(GLuint texture1, GLuint texture2, int process){
+void Realtime::paintFinal(GLuint texture1, GLuint texture2, int process){
+    glUseProgram(m_final_shader);
 
-//}
+    glBindVertexArray(m_fullscreen_vao);
+
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
+    glUseProgram(0);
+
+}
 
 glm::mat4 translator(float dx, float dy, float dz){
     return glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, dx, dy, dz, 1);
@@ -1509,7 +1538,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
         m_view = camera.getViewMatrix();
         incrementer -= 0.5f;
 
-        particleRemover();
+        //particleRemover();
 
 
     }

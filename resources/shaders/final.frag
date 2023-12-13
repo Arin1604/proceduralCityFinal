@@ -1,7 +1,30 @@
-uniform sampler2D qt_Texture0;
-varying vec4 qt_TexCoord0;
+#version 330 core
 
-void main(void)
+in vec2 uvCoord;
+
+
+uniform sampler2D texte;
+uniform sampler2D blur;
+
+
+
+
+out vec4 fragColor;
+
+void main()
 {
-    gl_FragColor = texture2D(qt_Texture0, qt_TexCoord0.st);
+    vec4 a = texture(texte, uvCoord);
+    vec4 b = texture(blur, uvCoord);
+
+    fragColor = a + b;
+
+
 }
+
+
+
+
+
+
+
+

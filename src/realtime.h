@@ -68,6 +68,7 @@ private:
     GLuint m_texture_shader; //stores id of textue
     GLuint m_shader; // Stores id of shader program
     GLuint m_hdr_shader;
+    GLuint m_final_shader;
     GLuint m_vbo;    // Stores id of VBO
     GLuint m_vao;    // Stores id of
     float incrementer = 0.f;
@@ -135,6 +136,7 @@ private:
     int projWidth;
     int projHeight;
     void paintTexture(GLuint texture, int process);
+    void paintFinal(GLuint texture1, GLuint texture2, int process);
     void paintSnow(GLuint shader, glm::mat4 view, glm::mat4 proj, glm::vec3 offset, Particle currPart);
     void makeFBO();
     void makeHdrFBO();
