@@ -11,8 +11,9 @@
 #include "sphere.h"
 #include "utils/shaderloader.h"
 #define GLM_ENABLE_EXPERIMENTAL
-#include "glm/ext.hpp"
 
+#include <random>
+#include "Building.h"
 
 //#include "glrenderer.h"
 
@@ -92,6 +93,87 @@ std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations
 
     return data;
 }
+
+
+float Realtime::getRandomFloat(float min, float max) {
+    // Use the Mersenne Twister random number generator
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 eng(rd()); // Seed the generator
+    std::uniform_real_distribution<> distr(min, max); // Define the range
+
+    return distr(eng);
+}
+
+// for final project generating city
+void Realtime::GenerateCity() {
+    // clean the old scene first:
+    m_building_arr.clear();
+
+    // make the ground plane:
+    glm::mat4 groundCTM = glm::mat4(1.0f);
+    groundCTM = glm::scale(groundCTM, glm::vec3(40.0f, 0.001f, 40.0f));
+    m_CTM_collection.push_back(groundCTM);
+
+    // add some streets in the city:
+    Building street1(glm::vec3(0.0f, 0.0f, 2.0f),glm::vec3(40.0f, 0.02f, 0.5f));
+    Building street2(glm::vec3(0.0f, 0.0f, -5.0f),glm::vec3(40.0f, 0.02f, 0.7f));
+    Building street3(glm::vec3(-5.0f, 0.0f, 0.0f),glm::vec3(0.7f, 0.02f, 40.0f));
+    Building street4(glm::vec3(3.0f, 0.0f, 0.0f),glm::vec3(0.7f, 0.02f, 40.0f));
+    Building street5(glm::vec3(7.0f, 0.0f, 0.0f),glm::vec3(0.5f, 0.02f, 40.0f));
+    Building street6(glm::vec3(0.0f, 0.0f, 8.0f),glm::vec3(40.0f, 0.02f, 0.5f));
+    Building street7(glm::vec3(0.0f, 0.0f, -12.0f),glm::vec3(40.0f, 0.02f, 0.7f));
+    Building street8(glm::vec3(0.0f, 0.0f, -17.0f),glm::vec3(40.0f, 0.02f, 0.7f));
+    Building street9(glm::vec3(-12.0f, 0.0f, 0.0f),glm::vec3(0.7f, 0.02f, 40.0f));
+    Building street0(glm::vec3(15.0f, 0.0f, 0.0f),glm::vec3(0.5f, 0.02f, 40.0f));
+    m_building_arr.push_back(street1);
+    m_building_arr.push_back(street2);
+    m_building_arr.push_back(street3);
+    m_building_arr.push_back(street4);
+    m_building_arr.push_back(street5);
+    m_building_arr.push_back(street6);
+    m_building_arr.push_back(street7);
+    m_building_arr.push_back(street8);
+    m_building_arr.push_back(street9);
+    m_building_arr.push_back(street0);
+
+    // add some random cubes:
+    int overlapCounter = 0;
+    // if the random building generator tries X times and still overalps with some buildings,
+    // then the city might be too crowded, we should stop adding new Buildings
+    int overlapThreshold = 100;
+    for(int i = 0; i < 130;){
+        float random_scale_x = getRandomFloat(0.8f, 1.5f);
+        float random_scale_y = getRandomFloat(1.0f, 3.5f);
+        float random_scale_z = getRandomFloat(0.8f, 1.5f);
+        float random_x = getRandomFloat(-18.0f,18.0f);
+        float random_z = getRandomFloat(-18.0f,18.0f);
+        float y = 0.5f*random_scale_y;
+        glm::vec3 scale(random_scale_x,random_scale_y,random_scale_z);
+        glm::vec3 pos(random_x, y, random_z);
+        Building newBuilding(pos, scale);
+        bool overlapFound = false;
+        for(Building b : m_building_arr){
+            if(newBuilding.checkOverlap(b)){
+                overlapFound = true;
+                overlapCounter++; // increment the overlap counter
+                break;
+            }
+        }
+
+        if(overlapFound && overlapCounter >= overlapThreshold){
+            std::cout<<"The city is too crowded! Stop adding new buildings!"<<std::endl;
+            break; // Break out of the loop if the overlap threshold is reached
+        }
+
+        if(!overlapFound){
+            m_building_arr.push_back(newBuilding);
+            i++;
+            overlapCounter = 0; // Reset overlap counter after successful addition
+        }
+    }
+}
+
+
 
 
 
@@ -208,8 +290,8 @@ void Realtime::generateData(){
     templateCylinderData = tempCylinder.generateShape();
 
     tempCone = cone();
-    tempCone.updateParams(settings.shapeParameter1, settings.shapeParameter2);
-    templateConeData = tempCone.generateShape();
+    tempCone.updateParams(settings.shapeParameter1);
+    templateConeData = tempCone.generateShape(true);
 
     tempSnow = snow();
     tempSnow.snowMaker(0.01f, 100, m_screen_width, m_screen_height);
@@ -441,6 +523,8 @@ void Realtime::initializeGL() {
     //makeHdrFBO();
     makeFBO();
 
+    //for final project
+    GenerateCity();
 
 }
 
@@ -685,7 +769,14 @@ int Realtime::getNumberOfLights(std::vector<SceneLightData> lights){
     return result;
 }
 
+void glErrorCheck(){
+    GLenum error = glGetError();
+    while(error != GL_NO_ERROR){
+        std::cout<<error<<std::endl;
 
+        error = glGetError();
+    }
+}
 
 
 void Realtime::paintGL() {
@@ -735,7 +826,7 @@ void Realtime::paintGL() {
 
 
 
-    if(metaData.shapes.size() != 0){
+     //if(metaData.shapes.size() != 0){
         // ****TO DO: PASS IN MODEL MATRIX AS UNIFORM
         // PASS IN ALL YOUR UNIFORMS
         for(int i = 0; i < metaData.shapes.size(); i++){
@@ -768,11 +859,6 @@ void Realtime::paintGL() {
             }
 
 
-
-
-
-
-
             GLint modelMatlocation = glGetUniformLocation(m_shader, "modelMat");
             glUniformMatrix4fv(modelMatlocation, 1, GL_FALSE, /*&m_modelTest[0][0]*/&metaData.shapes[i].ctm[0][0]);// using metadata causes program to crash
 
@@ -802,8 +888,8 @@ void Realtime::paintGL() {
 
 
             // Multiple light stuff
-            int lightSize = getNumberOfLights(metaData.lights);
-            //std::cout << lightDirSize << std::endl;
+            int lightSize = getNumberOfLights(metaData.lights) + m_building_arr.size();
+
 
             //Now make this work for all lights
             //Passing actual data into the structs
@@ -827,15 +913,166 @@ void Realtime::paintGL() {
             GLint diffuseColorLoc = glGetUniformLocation(m_shader, "m_D");
             glUniform3fv(diffuseColorLoc, 1, &metaData.shapes[i].primitive.material.cDiffuse[0]);
 
-
-
-
             glDrawArrays(GL_TRIANGLES, 0, triangles);
-
-
             glBindVertexArray(0);
+
+            // -----------final project part---------------------//
+
+            // paint the ground plain:
+            glm::mat4 groundCTM = m_CTM_collection[0];
+            glm::vec4 Ambient = glm::vec4(1.0,1.0,1.0,0.0);
+            glm::vec4 Diffuse = glm::vec4(0.7,0.7,0.7,0.0);
+            // glm::vec4 Specular = glm::vec4(1.0,1.0,1.0,0.0);
+            GLint locationM = glGetUniformLocation(m_shader,"modelMat");
+            glUniformMatrix4fv(locationM,1,GL_FALSE,&groundCTM[0][0]);
+            GLint locations = glGetUniformLocation(m_shader,"shine");
+            glUniform1f(locations,15);
+            GLint locationcA = glGetUniformLocation(m_shader,"m_A");
+            // glUniform4fv(locationcA,1,&Ambient[0]);
+            GLint locationcD = glGetUniformLocation(m_shader,"m_D");
+            glUniform4fv(locationcD,1,&Diffuse[0]);
+            GLint locationcS = glGetUniformLocation(m_shader,"m_S");
+            // glUniform4fv(locationcS,1,&Specular[0]);
+            glBindVertexArray(m_cube_vao);
+            triangles = templateCubeData.size()/6;
+            glDrawArrays(GL_TRIANGLES, 0, triangles);
+            glBindVertexArray(0);
+
+
+            // paint the street:
+            for(int i = 0; i < 5; i++){
+                glm::mat4 CTM = m_building_arr[i].CTM;
+                glm::vec4 Ambient = glm::vec4(0.0,0.5,0.5,0.0);
+                glm::vec4 Diffuse = glm::vec4(0.0,0.7,0.7,0.0);
+                // glm::vec4 Specular = glm::vec4(1.0,1.0,1.0,1.0);
+                GLint locationM = glGetUniformLocation(m_shader,"modelM");
+                glUniformMatrix4fv(locationM,1,GL_FALSE,&CTM[0][0]);
+                glm::mat4 MVP = m_proj * m_view * CTM;
+                GLint locationMVP = glGetUniformLocation(m_shader, "MVP");
+                glUniformMatrix4fv(locationMVP,1,GL_FALSE,&MVP[0][0]);
+                GLint locations = glGetUniformLocation(m_shader,"shine");
+                glUniform1f(locations,0);
+                GLint locationcA = glGetUniformLocation(m_shader,"m_A");
+                glUniform4fv(locationcA,1,&Ambient[0]);
+                GLint locationcD = glGetUniformLocation(m_shader,"m_D");
+                glUniform4fv(locationcD,1,&Diffuse[0]);
+                //            GLint locationcS = glGetUniformLocation(m_shader,"m_S");
+                //            glUniform4fv(locationcS,1,&Specular[0]);
+                glBindVertexArray(m_cube_vao);
+                triangles = templateCubeData.size()/6;
+                glDrawArrays(GL_TRIANGLES, 0, triangles);
+                glBindVertexArray(0);
+            }
+
+            // generate a light within each bulding
+            int lightStart = metaData.lights.size();
+            int building_index = 0;
+            glm::vec3 nullVec = glm::vec3(0.0, 0.0, 0.0);
+            glm::vec3 color = glm::vec3(0.5, 0.5, 0.25);
+            glm::vec3 atten = glm::vec3(0.05, 0.8, 2.0);
+            for (int i = lightStart; i < (m_building_arr.size() + lightStart); i++) {
+                // get current buliding ctm
+                // use to generate a light position
+
+
+
+                glm::vec3 position(m_building_arr[i].position[0] + 0.3, m_building_arr[i].position[1] - 1.f, m_building_arr[i].position[2] - 0.3);
+
+
+                std::string s = "lights[" + std::to_string(i) + "].type"; //look into implementing multiple lights
+                GLint locType = glGetUniformLocation(m_shader, s.c_str());
+
+                std::string sCol = "lights[" + std::to_string(i) + "].color"; //look into implementing multiple lights
+                GLint locColor = glGetUniformLocation(m_shader, sCol.c_str());
+
+                std::string sAtt = "lights[" + std::to_string(i) + "].attenuation"; //look into implementing multiple lights
+                GLint locAtt = glGetUniformLocation(m_shader, sAtt.c_str());
+
+                std::string sPos = "lights[" + std::to_string(i) + "].pos"; //look into implementing multiple lights
+                GLint locPos = glGetUniformLocation(m_shader, sPos.c_str());
+
+                std::string sDir = "lights[" + std::to_string(i) + "].dir"; //look into implementing multiple lights
+                GLint locDir = glGetUniformLocation(m_shader, sDir.c_str());
+
+                std::string sPen = "lights[" + std::to_string(i) + "].penumbra"; //look into implementing multiple lights
+                GLint locPen = glGetUniformLocation(m_shader, sPen.c_str());
+
+                std::string sAng = "lights[" + std::to_string(i) + "].angle"; //look into implementing multiple lights
+                GLint locAng = glGetUniformLocation(m_shader, sAng.c_str());
+
+                //position = glm::vec3(1.f, 1.f, 1.f);
+
+
+                glUniform1i(locType, 1);
+
+
+                glUniform1f(locAng, 0.f);
+
+
+                glUniform1f(locPen, 0.f);
+
+                glUniform3fv(locDir, 1, &nullVec[0]);
+
+
+
+                glUniform3fv(locColor, 1, &color[0]);
+
+
+
+                glUniform3fv(locAtt, 1, &atten[0]);
+
+
+
+                glUniform3fv(locPos, 1, &position[0]);
+
+
+
+
+                building_index++;
+            }
+
+            // paint all the buildings
+            for(int i = 0; i < m_building_arr.size(); i++){
+                glm::mat4 CTM = m_building_arr[i].CTM;
+                glm::vec4 Ambient = glm::vec4(0.5,0.5,0.5,0.0);
+                glm::vec4 Diffuse = glm::vec4(0.7,0.7,0.5,0.0);
+                glm::vec4 Specular = glm::vec4(0.2,0.2,0.2,1.0);
+                GLint locationM = glGetUniformLocation(m_shader,"modelMat");
+                glUniformMatrix4fv(locationM,1,GL_FALSE,&CTM[0][0]);
+                GLint locations = glGetUniformLocation(m_shader,"shine");
+                glUniform1f(locations,0);
+                GLint locationcA = glGetUniformLocation(m_shader,"m_A");
+                glUniform4fv(locationcA,1,&Ambient[0]);
+                GLint locationcD = glGetUniformLocation(m_shader,"m_D");
+                glUniform4fv(locationcD,1,&Diffuse[0]);
+                GLint locationcS = glGetUniformLocation(m_shader,"m_S");
+                glUniform4fv(locationcS,1,&Specular[0]);
+
+                float r = m_building_arr[i].randy;
+                if (r < 0.5) {
+                    glBindVertexArray(m_cube_vao);
+                    triangles = templateCubeData.size()/6;
+                    glDrawArrays(GL_TRIANGLES, 0, triangles);
+                } else if (r < 0.75) {
+                    glBindVertexArray(m_cylinder_vao);
+                    triangles = templateCylinderData.size()/6;
+                    glDrawArrays(GL_TRIANGLES, 0, triangles);
+                } else {
+                    glBindVertexArray(m_cone_vao);
+                    triangles = templateConeData.size()/6;
+                    glDrawArrays(GL_TRIANGLES, 0, triangles);
+                }
+                glBindVertexArray(0);
+
+
+
+            }
+            // ----------final project-----------------------//
+
+
+
         }
-    }
+    // }
 
     // Unbind the shader
     glUseProgram(0);
@@ -887,13 +1124,9 @@ void Realtime::paintGL() {
         filterType = 2;
     }
 
-    paintTexture(m_new_fbo_texture, filterType);
 
-    //        particleRemover();
-    //    for(int i = 0; i < particles.size(); i++){
+     paintTexture(m_new_fbo_texture, filterType);
 
-    //        paintSnow(m_hdr_fbo_texture, m_view, m_proj, glm::vec3(0.7f, 0.7f, 0.7f), particles[i]);
-    //    }
 
 
 
@@ -1064,6 +1297,7 @@ void Realtime::sceneChanged() {
     std::cout<< metaData.shapes[0].ctm[0][2] << std::endl;
     std::cout<< "meta call" << std::endl;
 
+    GenerateCity();
 
     update(); // asks for a PaintGL() call to occur
 
@@ -1087,8 +1321,8 @@ void Realtime::settingsChanged() {
         templateCylinderData = tempCylinder.generateShape();
         binderHelper(m_cylinder_vao, m_cylinder_vbo, templateCylinderData);
 
-        tempCone.updateParams(settings.shapeParameter1, settings.shapeParameter2);
-        templateConeData = tempCone.generateShape();
+        tempCone.updateParams(settings.shapeParameter1);
+        templateConeData = tempCone.generateShape(true);
         binderHelper(m_cone_vao, m_cone_vbo, templateConeData);
 
 
@@ -1104,6 +1338,9 @@ void Realtime::settingsChanged() {
         //    sphere.generate shape
         //     update vbos
 
+
+
+        GenerateCity();
         update(); // asks for a PaintGL() call to occur
     }
 }
@@ -1166,10 +1403,10 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
 
         // Use deltaX and deltaY here to rotate
 
-        float thetaX = deltaX * 0.001;
+        float thetaX = deltaX * 0.005;
         glm::vec3 xRotAxis(0.f, 1.f, 0.f);
 
-        float thetaY = deltaY * 0.001;
+        float thetaY = deltaY * 0.005;
         glm::vec3 yRotAxis = glm::vec3(glm::normalize(glm::cross(glm::vec3(camera.look), glm::vec3(camera.up))));
 
         camera.look = rotHelper(thetaY, yRotAxis) * rotHelper(thetaX, xRotAxis) * camera.look;
@@ -1234,7 +1471,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     if(m_keyMap[Qt::Key_A]){
-        std::cout << "A pressed" << std::endl;
+        // std::cout << "A pressed" << std::endl;
         camera.pos -= 5.f * deltaTime * right;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();
@@ -1242,7 +1479,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     if(m_keyMap[Qt::Key_D]){
-        std::cout << "D pressed" << std::endl;
+        // std::cout << "D pressed" << std::endl;
 
         camera.pos += 5.f * deltaTime * right;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
@@ -1251,7 +1488,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     if(m_keyMap[Qt::Key_Space]){
-        std::cout << "space pressed" << std::endl;
+        // std::cout << "space pressed" << std::endl;
         camera.pos += 5.f * deltaTime * worldUp;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();
@@ -1259,7 +1496,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     if(m_keyMap[Qt::Key_Control]){
-        std::cout << "ctrl pressed" << std::endl;
+        // std::cout << "ctrl pressed" << std::endl;
         camera.pos -= 5.f * deltaTime * worldUp;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();

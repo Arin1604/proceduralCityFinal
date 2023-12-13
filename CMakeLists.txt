@@ -54,6 +54,8 @@ add_executable(${PROJECT_NAME}
     src/cone.cpp
     src/snow.cpp
     src/snow.h
+    src/Building.h
+    src/Building.cpp
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -61,6 +63,7 @@ add_subdirectory(glm)
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
 add_library(StaticGLEW STATIC glew/src/glew.c
+
 
 )
 include_directories(${PROJECT_NAME} PRIVATE glew/include)

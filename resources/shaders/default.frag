@@ -31,8 +31,8 @@ float angle;    // Only applicable to spot lights, in RADIANS
 //pass in array of light structs
 
 //Light data
-uniform SceneLights lights[8];
-uniform vec3 lightColors[8];
+uniform SceneLights lights[145];
+uniform vec3 lightColors[100];
 
 
 

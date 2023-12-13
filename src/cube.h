@@ -6,6 +6,7 @@
 class cube
 {
 public:
+public:
     void updateParams(int param1);
     std::vector<float> generateShape() { return m_vertexData; }
 
@@ -19,8 +20,12 @@ private:
     void makeFace(glm::vec3 topLeft,
                   glm::vec3 topRight,
                   glm::vec3 bottomLeft,
-                  glm::vec3 bottomRight);
-
+                  glm::vec3 bottomRight, bool makeWindows);
+    void makeReverseTileOnly(glm::vec3 topLeft,
+                             glm::vec3 topRight,
+                             glm::vec3 bottomLeft,
+                             glm::vec3 bottomRight);
     std::vector<float> m_vertexData;
     int m_param1;
+
 };
