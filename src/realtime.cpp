@@ -1513,7 +1513,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     //std::cout << m_keyMap[Qt::Key_W] << std::endl;
     if(m_keyMap[Qt::Key_W]){
 
-        camera.pos += 5.f * deltaTime * lookDir;
+        camera.pos += 2.f * deltaTime * lookDir;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();
 
@@ -1533,7 +1533,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     if(m_keyMap[Qt::Key_S]){
         //std::cout << "S pressed" << std::endl;
-        camera.pos -= 1.f * deltaTime * lookDir;
+        camera.pos -= 2.f * deltaTime * lookDir;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();
         incrementer -= 0.5f;
@@ -1545,7 +1545,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     if(m_keyMap[Qt::Key_A]){
         // std::cout << "A pressed" << std::endl;
-        camera.pos -= 5.f * deltaTime * right;
+        camera.pos -= 2.f * deltaTime * right;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();
 
@@ -1554,7 +1554,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     if(m_keyMap[Qt::Key_D]){
         // std::cout << "D pressed" << std::endl;
 
-        camera.pos += 5.f * deltaTime * right;
+        camera.pos += 2.f * deltaTime * right;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();
 
@@ -1562,8 +1562,60 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     if(m_keyMap[Qt::Key_Space]){
         // std::cout << "space pressed" << std::endl;
-        camera.pos += 5.f * deltaTime * worldUp;
+        camera.pos += 2.f * deltaTime * worldUp;
         camera.updateViewMatrix(camera.pos, camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
+        m_view = camera.getViewMatrix();
+
+    }
+
+    if(m_keyMap[Qt::Key_Left]){
+        // std::cout << "space pressed" << std::endl;
+        float thetaX = deltaTime * 0.1;
+        glm::vec3 xRotAxis(0.f, 1.f, 0.f);
+
+        camera.look = rotHelper(thetaX, xRotAxis) * camera.look;
+        camera.updateViewMatrix(camera.pos,camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
+        m_view = camera.getViewMatrix();
+
+
+
+    }
+
+    if(m_keyMap[Qt::Key_Up]){
+        // std::cout << "space pressed" << std::endl;
+        float thetaX = deltaTime * 0.1;
+        glm::vec3 yRotAxis = glm::vec3(glm::normalize(glm::cross(glm::vec3(camera.look), glm::vec3(camera.up))));
+
+
+        camera.look = rotHelper(thetaX, yRotAxis) * camera.look;
+        camera.updateViewMatrix(camera.pos,camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
+        m_view = camera.getViewMatrix();
+
+
+
+    }
+
+    if(m_keyMap[Qt::Key_Down]){
+        // std::cout << "space pressed" << std::endl;
+        float thetaX = - deltaTime * 0.1;
+        glm::vec3 yRotAxis = glm::vec3(glm::normalize(glm::cross(glm::vec3(camera.look), glm::vec3(camera.up))));
+
+
+        camera.look = rotHelper(thetaX, yRotAxis) * camera.look;
+        camera.updateViewMatrix(camera.pos,camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
+        m_view = camera.getViewMatrix();
+
+
+
+    }
+
+    if(m_keyMap[Qt::Key_Right]){
+        // std::cout << "space pressed" << std::endl;
+        float thetaX = -deltaTime * 0.1;
+        glm::vec3 xRotAxis(0.f, 1.f, 0.f);
+
+        camera.look = rotHelper(thetaX, xRotAxis) * camera.look;
+        camera.updateViewMatrix(camera.pos,camera.look,camera.up); /*m_view * translate * glm::mat4(5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir, 5.f * deltaTime * lookDir);*/
         m_view = camera.getViewMatrix();
 
     }
